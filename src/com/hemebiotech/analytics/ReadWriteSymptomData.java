@@ -63,12 +63,12 @@ public class ReadWriteSymptomData implements ISymptomReaderWriter {
 	@Override
 	public void countSymptoms() {
 		Integer vCount = 0;
-		for(int i = 0; i < this.symptoms.size(); i++) {
-			if(!this.symptomsCounter.containsKey(this.symptoms.get(i))) {
+		for(int i = 0; i < this.symptomsDuplicate.size(); i++) {
+			if(!this.symptomsCounter.containsKey(this.symptomsDuplicate.get(i))) {
 				vCount = 1;
-				this.symptomsCounter.put(this.symptoms.get(i), vCount);
+				this.symptomsCounter.put(this.symptomsDuplicate.get(i), vCount);
 			}
-			this.symptomsCounter.put(this.symptoms.get(i), vCount++);
+			this.symptomsCounter.put(this.symptomsDuplicate.get(i), vCount++);
 		}
 	}
 
