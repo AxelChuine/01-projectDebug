@@ -1,10 +1,13 @@
 package com.hemebiotech.analytics;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -21,6 +24,7 @@ public class ReadWriteSymptomData implements ISymptomReaderWriter {
 	private List<String> symptomsDuplicate;
 	private LinkedHashMap<String, Integer> symptomsCounter;
 	private File resultOut;
+	private BufferedWriter bw;
 	/**
 	 * 
 	 * @param inputFileName a full or partial path to file with symptom strings in it, one per line
@@ -36,8 +40,8 @@ public class ReadWriteSymptomData implements ISymptomReaderWriter {
 	}
 	
 	@Override
-	public List<String> GetSymptoms() {
-		ArrayList<String> result = new ArrayList<String>();
+	public void GetSymptoms() {
+		this.symptomsDuplicate = new ArrayList<String>();
 		
 		if (inputFileName != null) {
 			try {
@@ -45,16 +49,51 @@ public class ReadWriteSymptomData implements ISymptomReaderWriter {
 				String line = reader.readLine();
 				
 				while (line != null) {
-					result.add(line);
+					this.symptomsDuplicate.add(line);
 					line = reader.readLine();
 				}
+				this.symptomsDuplicate.sort(Comparator.comparing(String::toString));
 				reader.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
-		
-		return result;
+	}
+
+	@Override
+	public void countSymptoms() {
+		Integer vCount = 0;
+		for(int i = 0; i < this.symptoms.size(); i++) {
+			if(!this.symptomsCounter.containsKey(this.symptoms.get(i))) {
+				vCount = 1;
+				this.symptomsCounter.put(this.symptoms.get(i), vCount);
+			}
+			this.symptomsCounter.put(this.symptoms.get(i), vCount++);
+		}
+	}
+
+	@Override
+	public void eliminateDuplicate() {
+		for(String key : this.symptomsDuplicate) {
+			if(!this.symptoms.contains(key)) {
+				this.symptoms.add(key);
+			}
+		}
+	}
+
+	@Override
+	public void writeInFile() {
+		try {
+			this.bw = new BufferedWriter(new FileWriter(resultOut));
+			for(String key : this.symptoms) {
+				this.bw.write(key+" = "+this.symptomsCounter.get(key));
+				this.bw.newLine();
+			}
+			this.bw.close();
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 }
