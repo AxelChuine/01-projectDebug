@@ -20,11 +20,11 @@ public class ReadWriteSymptomData implements ISymptomReaderWriter {
 	private String line;
 	private String inputFileName;
 	private String outputFileName;
+	private Integer counter;
 	private List<String> symptoms;
 	private List<String> symptomsDuplicate;
 	private LinkedHashMap<String, Integer> symptomsCounter;
 	private File resultOut;
-	private BufferedWriter bw;
 	/**
 	 * 
 	 * @param inputFileName a full or partial path to file with symptom strings in it, one per line
@@ -33,6 +33,7 @@ public class ReadWriteSymptomData implements ISymptomReaderWriter {
 		this.line = "";
 		this.inputFileName = inputFileName;
 		this.outputFileName = outputFileName;
+		this.counter = 0;
 		this.symptoms = new ArrayList<String>();
 		this.symptomsDuplicate = new ArrayList<String>();
 		this.symptomsCounter = new LinkedHashMap<>();
@@ -40,19 +41,23 @@ public class ReadWriteSymptomData implements ISymptomReaderWriter {
 	}
 	
 	@Override
-	public void GetSymptoms() {
-		this.symptomsDuplicate = new ArrayList<String>();
+	public void getSymptoms() {
+		this.symptoms = new ArrayList<String>();
 		
 		if (inputFileName != null) {
 			try {
 				BufferedReader reader = new BufferedReader (new FileReader(inputFileName));
-				String line = reader.readLine();
+				this.line = reader.readLine();
 				
-				while (line != null) {
-					this.symptomsDuplicate.add(line);
-					line = reader.readLine();
+				while (this.line != null) {
+					if(!this.symptoms.contains(this.line)) {
+						this.symptomsCounter.put(this.line, 0);
+						this.symptoms.add(this.line);
+					}
+					this.symptomsCounter.put(this.line, this.symptomsCounter.get(this.line)+1);
+					this.line = reader.readLine();
 				}
-				this.symptomsDuplicate.sort(Comparator.comparing(String::toString));
+				this.symptoms.sort(Comparator.comparing(String::toString));
 				reader.close();
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -61,35 +66,14 @@ public class ReadWriteSymptomData implements ISymptomReaderWriter {
 	}
 
 	@Override
-	public void countSymptoms() {
-		Integer vCount = 0;
-		for(int i = 0; i < this.symptomsDuplicate.size(); i++) {
-			if(!this.symptomsCounter.containsKey(this.symptomsDuplicate.get(i))) {
-				vCount = 1;
-				this.symptomsCounter.put(this.symptomsDuplicate.get(i), vCount);
-			}
-			this.symptomsCounter.put(this.symptomsDuplicate.get(i), vCount++);
-		}
-	}
-
-	@Override
-	public void eliminateDuplicate() {
-		for(String key : this.symptomsDuplicate) {
-			if(!this.symptoms.contains(key)) {
-				this.symptoms.add(key);
-			}
-		}
-	}
-
-	@Override
 	public void writeInFile() {
 		try {
-			this.bw = new BufferedWriter(new FileWriter(resultOut));
+			BufferedWriter bw = new BufferedWriter(new FileWriter(resultOut));
 			for(String key : this.symptoms) {
-				this.bw.write(key+" = "+this.symptomsCounter.get(key));
-				this.bw.newLine();
+				bw.write(key+" = "+this.symptomsCounter.get(key));
+				bw.newLine();
 			}
-			this.bw.close();
+			bw.close();
 		}
 		catch (IOException e) {
 			e.printStackTrace();

@@ -16,19 +16,7 @@ public interface ISymptomReaderWriter {
 	 * 
 	 * @return a raw listing of all Symptoms obtained from a data source, duplicates are possible/probable
 	 */
-	public void GetSymptoms ();
-	
-	/**
-	 * @type void
-	 * method that fills an arraylist with the symptoms of the file symptoms.txt
-	 */
-	public void countSymptoms();
-	
-	/**
-	 * @type void
-	 * method that eliminates duplicate symptoms.
-	 */
-	public void eliminateDuplicate();
+	public void getSymptoms ();
 	
 	/**
 	 * @type void

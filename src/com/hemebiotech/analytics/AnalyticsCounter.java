@@ -7,9 +7,7 @@ import java.io.FileWriter;
 public class AnalyticsCounter {	
 	public static void main(String args[]) throws Exception {
 		ISymptomReaderWriter test = new ReadWriteSymptomData("symptoms.txt", "result.out");
-		test.GetSymptoms();
-		test.countSymptoms();
-		test.eliminateDuplicate();
+		test.getSymptoms();
 		test.writeInFile();
 	}
 }
