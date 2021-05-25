@@ -2,7 +2,6 @@ package com.hemebiotech.analytics;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -17,27 +16,19 @@ import java.util.List;
  */
 public class ReadWriteSymptomData implements ISymptomReaderWriter {
 
-	private String line;
 	private String inputFileName;
 	private String outputFileName;
-	private Integer counter;
 	private List<String> symptoms;
-	private List<String> symptomsDuplicate;
 	private LinkedHashMap<String, Integer> symptomsCounter;
-	private File resultOut;
 	/**
 	 * 
 	 * @param inputFileName a full or partial path to file with symptom strings in it, one per line
 	 */
 	public ReadWriteSymptomData (String inputFileName, String outputFileName) {
-		this.line = "";
 		this.inputFileName = inputFileName;
 		this.outputFileName = outputFileName;
-		this.counter = 0;
 		this.symptoms = new ArrayList<String>();
-		this.symptomsDuplicate = new ArrayList<String>();
 		this.symptomsCounter = new LinkedHashMap<>();
-		this.resultOut = new File(this.outputFileName);
 	}
 	
 	@Override
@@ -47,15 +38,15 @@ public class ReadWriteSymptomData implements ISymptomReaderWriter {
 		if (inputFileName != null) {
 			try {
 				BufferedReader reader = new BufferedReader (new FileReader(inputFileName));
-				this.line = reader.readLine();
+				String line = reader.readLine();
 				
-				while (this.line != null) {
-					if(!this.symptoms.contains(this.line)) {
-						this.symptomsCounter.put(this.line, 0);
-						this.symptoms.add(this.line);
+				while (line != null) {
+					if(!this.symptoms.contains(line)) {
+						this.symptomsCounter.put(line, 0);
+						this.symptoms.add(line);
 					}
-					this.symptomsCounter.put(this.line, this.symptomsCounter.get(this.line)+1);
-					this.line = reader.readLine();
+					this.symptomsCounter.put(line, this.symptomsCounter.get(line)+1);
+					line = reader.readLine();
 				}
 				this.symptoms.sort(Comparator.comparing(String::toString));
 				reader.close();
@@ -68,6 +59,7 @@ public class ReadWriteSymptomData implements ISymptomReaderWriter {
 	@Override
 	public void writeInFile() {
 		try {
+			String resultOut = this.outputFileName;
 			BufferedWriter bw = new BufferedWriter(new FileWriter(resultOut));
 			for(String key : this.symptoms) {
 				bw.write(key+" = "+this.symptomsCounter.get(key));
